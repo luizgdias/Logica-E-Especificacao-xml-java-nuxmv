@@ -1,3 +1,9 @@
+/*
+  Algoritmo que converte a especificação de um workflow no formato XML para o formato .smv. 
+ Como saída é gerado um arquivo que quando submetido a um model cheker específico, verifica
+  a existência de deadlocks.
+ */
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,8 +22,12 @@ import org.xml.sax.SAXException;
 public class Principal {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String resultado = "Estados: ";
-		
+		String newLine = System.getProperty("line.separator");
+		String resultado = "";
+		String estados = newLine+"Estados:"+ newLine;
+		String relacoes = "Relações: "+ newLine;
+		String estadosRelacoes = "Estados + Relações:"+ newLine;
+
 		try {
 			//Objetos para fazer o parsing
 			DocumentBuilderFactory 	factory = 	DocumentBuilderFactory.newInstance();
@@ -30,16 +40,19 @@ public class Principal {
 			
 			int tamLista = listaDeAtividades.getLength();
 			System.out.println("**Estados que compõem o workflow**");
-			String estados = "";
+		
 			for (int i = 0; i < tamLista; i++) {
 				//coloca as atividades em uma lista e mostra seu nome
 				Node noAtividade = (Node) listaDeAtividades.item(i);
 				if (noAtividade.getNodeType() == Node.ELEMENT_NODE) {
 					org.w3c.dom.Element elementoAtividade = (org.w3c.dom.Element) noAtividade;
-					System.out.print("Estado: S"+i+", ");
+					System.out.print("Estado -> S"+i+", ");
 					String desc = elementoAtividade.getAttribute("tag");
-					System.out.print("Nome do estado: "+desc+"\n");	
-					resultado = resultado + desc+ " ";
+					System.out.print("nome -> "+desc+"\n");
+					
+					estados 		= estados + desc + newLine ;
+					estadosRelacoes = estadosRelacoes + desc;
+					
 					
 					NodeList listaDeSubTagsDaAtividade = elementoAtividade.getChildNodes();
 					int tamListaSubTags = listaDeSubTagsDaAtividade.getLength();
@@ -50,7 +63,13 @@ public class Principal {
 							org.w3c.dom.Element subTag = (org.w3c.dom.Element) noSubTag;
 							switch (subTag.getTagName()) {
 							case "relation":
-								System.out.println("Tipo: "+subTag.getAttribute("reltype") + " Dependencia:" + subTag.getAttribute("dependency"));
+								String tipoRelacao 	= subTag.getAttribute("reltype");
+								String dependeDe 	= subTag.getAttribute("dependency");
+								if (dependeDe == "") {
+									dependeDe = " null";
+								}
+								estadosRelacoes = estadosRelacoes +" "+ tipoRelacao +" "+ dependeDe;
+								System.out.println("Relação -> tipo: "+ tipoRelacao + " depende de: " + dependeDe);
 								break;
 
 							default:
@@ -58,10 +77,12 @@ public class Principal {
 							}
 						}
 					}
+					estadosRelacoes = estadosRelacoes +newLine;
+					System.out.print("\n");
 				}
 			}
 			
-			resultado = resultado + "\n Relações: ";
+			estados = estados + newLine+ newLine+"Relações:"+newLine;
 			
 			System.out.println("");
 			System.out.println("\n**Relações dos estados do workflow**");
@@ -76,7 +97,7 @@ public class Principal {
 					String nome = elementoRelacao.getAttribute("name");
 					String dependencia = elementoRelacao.getAttribute("dependency");
 					String tipo = elementoRelacao.getAttribute("reltype");
-					resultado = resultado +" "+ nome +" "+ dependencia +" "+ tipo+ " ";
+					estados = estados + nome + dependencia + tipo+ newLine ;
 					if (dependencia == "") {
 						dependencia = "null, ";
 					}
@@ -103,7 +124,9 @@ public class Principal {
 		
 		try {
 			//adicionar o arquivoDeSaida.smv no diretório C:\\
+			
 			Path diretorio = Paths.get("C:\\arquivoDeSaida.smv");
+			resultado = estadosRelacoes + estados + relacoes;
 			byte[] gravar = resultado.getBytes();
 			Files.write(diretorio, gravar);
 			
