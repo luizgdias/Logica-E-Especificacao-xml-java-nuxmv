@@ -84,7 +84,7 @@ public class Principal {
 		
 		
 		try {
-			Path diretorio = Paths.get("C:\\LogicaEEspecificacao.smv");
+			Path diretorio = Paths.get("C:\\arquivoDeSaida.smv");
 			byte[] gravar = resultado.getBytes();
 			Files.write(diretorio, gravar);
 			

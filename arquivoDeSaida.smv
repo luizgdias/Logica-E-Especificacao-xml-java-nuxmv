@@ -1,0 +1,2 @@
+Estados: dataselection mafft readseq modelgenerator raxml1 raxml2 mergeRaxml raxml3 
+ Relações:  idataselection  Input  odataselection  Output   dataselection Input  omafft  Output   mafft Input  oreadseq  Output   readseq Input  omodelgenerator  Output   modelgenerator Input  oraxml1  Output   modelgenerator Input  oraxml2  Output   raxml1 Input   raxml2 Input  omergeraxml  Output   mergeRaxml Input  oraxml3  Output  idataselection   
