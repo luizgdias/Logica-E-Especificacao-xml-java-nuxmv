@@ -38,8 +38,26 @@ public class Principal {
 					org.w3c.dom.Element elementoAtividade = (org.w3c.dom.Element) noAtividade;
 					System.out.print("Estado: S"+i+", ");
 					String desc = elementoAtividade.getAttribute("tag");
-					System.out.print("Name: "+desc+"\n");	
+					System.out.print("Nome do estado: "+desc+"\n");	
 					resultado = resultado + desc+ " ";
+					
+					NodeList listaDeSubTagsDaAtividade = elementoAtividade.getChildNodes();
+					int tamListaSubTags = listaDeSubTagsDaAtividade.getLength();
+					
+					for (int j = 0; j < tamListaSubTags; j++) {
+						Node noSubTag = listaDeSubTagsDaAtividade.item(j);
+						if (noSubTag.getNodeType() == Node.ELEMENT_NODE) {
+							org.w3c.dom.Element subTag = (org.w3c.dom.Element) noSubTag;
+							switch (subTag.getTagName()) {
+							case "relation":
+								System.out.println("Tipo: "+subTag.getAttribute("reltype") + " Dependencia:" + subTag.getAttribute("dependency"));
+								break;
+
+							default:
+								break;
+							}
+						}
+					}
 				}
 			}
 			
@@ -84,6 +102,7 @@ public class Principal {
 		
 		
 		try {
+			//adicionar o arquivoDeSaida.smv no diretório C:\\
 			Path diretorio = Paths.get("C:\\arquivoDeSaida.smv");
 			byte[] gravar = resultado.getBytes();
 			Files.write(diretorio, gravar);
