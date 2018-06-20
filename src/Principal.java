@@ -24,8 +24,8 @@ public class Principal {
 		// TODO Auto-generated method stub
 		String newLine 			= System.getProperty("line.separator");
 		String resultado 		= "";
-		String estados 			=  "Estados:"			+ newLine;
-		String relacoes 		= "Relações:"			+ newLine;
+		String estados 			=  ""			;
+		String relacoes 		= ""			+ newLine;
 		String estadosRelacoes 	= "Estados + Relações:"	+ newLine;
 
 		try {
@@ -41,12 +41,20 @@ public class Principal {
 			int tamLista = listaDeAtividades.getLength();
 			for (int i = 0; i < tamLista; i++) {
 				//coloca as atividades em uma lista e mostra seu nome
+				
+				relacoes = relacoes + "dependencia"+i+": {";
 				Node noAtividade = (Node) listaDeAtividades.item(i);
 				if (noAtividade.getNodeType() == Node.ELEMENT_NODE) {
 					org.w3c.dom.Element elementoAtividade = (org.w3c.dom.Element) noAtividade;
 					String desc = elementoAtividade.getAttribute("tag");
 					
-					estados 		= estados + desc + newLine ;
+					estados 		= estados + desc;
+					
+					relacoes = relacoes + desc;
+					
+					if (i < tamLista-1) {
+						estados = estados + ", ";
+					}
 					estadosRelacoes = estadosRelacoes + desc;
 					
 					NodeList listaDeSubTagsDaAtividade = elementoAtividade.getChildNodes();
@@ -64,11 +72,12 @@ public class Principal {
 							case "relation":
 								String tipoRelacao 	= subTag.getAttribute("reltype");
 								String dependeDe 	= subTag.getAttribute("dependency");
-								if (dependeDe == "") {
-									dependeDe = "null";
+								
+								if (dependeDe != "") {
+									relacoes		= relacoes + ", "+ dependeDe;
 								}
 								estadosRelacoes = estadosRelacoes +" "+ tipoRelacao +" "+ dependeDe;
-								relacoes		= relacoes +" "+ tipoRelacao +" "+ dependeDe + newLine;
+								
 								break;
 
 							default:
@@ -77,12 +86,13 @@ public class Principal {
 						}
 					}
 					
+					
 					estadosRelacoes = estadosRelacoes + newLine;
 
 				}
+				
+				relacoes = relacoes +"};"+newLine;
 			}
-			
-			estados = estados + newLine;
 			
 			/*System.out.println("");
 			System.out.println("\n**Relações dos estados do workflow**");
@@ -128,13 +138,23 @@ public class Principal {
 		try {
 			//adicionar o arquivoDeSaida.smv no diretório C:\\
 			
+			String nuxmv = "MODULE main\r\n" + 
+					"VAR\r\n"
+					+ "state: {" +estados+ "};"
+					+ relacoes+
+					"\nINIT"+
+					"TRANS"+
+					"INVARSPEC";
+			
 			Path diretorio = Paths.get("C:\\arquivoDeSaida.smv");
 			resultado = estadosRelacoes + estados + relacoes;
-			byte[] gravar = resultado.getBytes();
+			byte[] gravar = nuxmv.getBytes();
 			Files.write(diretorio, gravar);
 			
-			System.out.println(estados);
-			System.out.println(relacoes);
+			//System.out.println(estados);
+			//System.out.println(relacoes);
+			//System.out.println(estadosRelacoes);
+			System.out.println(nuxmv);
 			System.out.println(estadosRelacoes);
 			
 		} catch (Exception e) {
