@@ -22,11 +22,11 @@ import org.xml.sax.SAXException;
 public class Principal {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String newLine = System.getProperty("line.separator");
-		String resultado = "";
-		String estados = newLine+"Estados:"+ newLine;
-		String relacoes = "Relações: "+ newLine;
-		String estadosRelacoes = "Estados + Relações:"+ newLine;
+		String newLine 			= System.getProperty("line.separator");
+		String resultado 		= "";
+		String estados 			=  "Estados:"			+ newLine;
+		String relacoes 		= "Relações:"			+ newLine;
+		String estadosRelacoes 	= "Estados + Relações:"	+ newLine;
 
 		try {
 			//Objetos para fazer o parsing
@@ -39,37 +39,36 @@ public class Principal {
 			NodeList listaDeRelacoe		= arquivoXML.getElementsByTagName("relation");
 			
 			int tamLista = listaDeAtividades.getLength();
-			System.out.println("**Estados que compõem o workflow**");
-		
 			for (int i = 0; i < tamLista; i++) {
 				//coloca as atividades em uma lista e mostra seu nome
 				Node noAtividade = (Node) listaDeAtividades.item(i);
 				if (noAtividade.getNodeType() == Node.ELEMENT_NODE) {
 					org.w3c.dom.Element elementoAtividade = (org.w3c.dom.Element) noAtividade;
-					System.out.print("Estado -> S"+i+", ");
 					String desc = elementoAtividade.getAttribute("tag");
-					System.out.print("nome -> "+desc+"\n");
 					
 					estados 		= estados + desc + newLine ;
 					estadosRelacoes = estadosRelacoes + desc;
-					
 					
 					NodeList listaDeSubTagsDaAtividade = elementoAtividade.getChildNodes();
 					int tamListaSubTags = listaDeSubTagsDaAtividade.getLength();
 					
 					for (int j = 0; j < tamListaSubTags; j++) {
+						
 						Node noSubTag = listaDeSubTagsDaAtividade.item(j);
+						
 						if (noSubTag.getNodeType() == Node.ELEMENT_NODE) {
 							org.w3c.dom.Element subTag = (org.w3c.dom.Element) noSubTag;
+							
 							switch (subTag.getTagName()) {
+							
 							case "relation":
 								String tipoRelacao 	= subTag.getAttribute("reltype");
 								String dependeDe 	= subTag.getAttribute("dependency");
 								if (dependeDe == "") {
-									dependeDe = " null";
+									dependeDe = "null";
 								}
 								estadosRelacoes = estadosRelacoes +" "+ tipoRelacao +" "+ dependeDe;
-								System.out.println("Relação -> tipo: "+ tipoRelacao + " depende de: " + dependeDe);
+								relacoes		= relacoes +" "+ tipoRelacao +" "+ dependeDe + newLine;
 								break;
 
 							default:
@@ -77,14 +76,15 @@ public class Principal {
 							}
 						}
 					}
-					estadosRelacoes = estadosRelacoes +newLine;
-					System.out.print("\n");
+					
+					estadosRelacoes = estadosRelacoes + newLine;
+
 				}
 			}
 			
-			estados = estados + newLine+ newLine+"Relações:"+newLine;
+			estados = estados + newLine;
 			
-			System.out.println("");
+			/*System.out.println("");
 			System.out.println("\n**Relações dos estados do workflow**");
 			int tamListaRelacoes = listaDeRelacoe.getLength();
 			for (int i = 0; i < tamListaRelacoes; i++) {
@@ -94,13 +94,16 @@ public class Principal {
 				if (noRelacao.getNodeType() == Node.ELEMENT_NODE) {
 					org.w3c.dom.Element elementoRelacao = (org.w3c.dom.Element) noRelacao;
 					System.out.print("Relação: R"+i+", ");
+					
 					String nome = elementoRelacao.getAttribute("name");
 					String dependencia = elementoRelacao.getAttribute("dependency");
 					String tipo = elementoRelacao.getAttribute("reltype");
-					estados = estados + nome + dependencia + tipo+ newLine ;
+					
+					
 					if (dependencia == "") {
-						dependencia = "null, ";
+						dependencia = " null ";
 					}
+					relacoes =  dependencia + tipo + newLine ;
 					System.out.print("nome: "+nome+"");
 					System.out.print("dependência: "+dependencia+"");	
 					System.out.print("tipo: "+tipo+"\n");	
@@ -108,7 +111,7 @@ public class Principal {
 					//NodeList listaDeAtributos = elementoAtividade.getChildNodes();
 					//System.out.println("R"+i+", ");
 				}
-			}
+			}*/
 			
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
@@ -129,6 +132,10 @@ public class Principal {
 			resultado = estadosRelacoes + estados + relacoes;
 			byte[] gravar = resultado.getBytes();
 			Files.write(diretorio, gravar);
+			
+			System.out.println(estados);
+			System.out.println(relacoes);
+			System.out.println(estadosRelacoes);
 			
 		} catch (Exception e) {
 			// TODO: handle exception
