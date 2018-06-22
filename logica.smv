@@ -1,0 +1,19 @@
+MODULE main
+
+VAR
+  state: {dataselection, mafft, readseq, modelgenerator};
+  x: boolean;
+ASSIGN 
+	init(state) := dataselection;
+	init(x)		:= FALSE;
+	next(state) := case
+                    (state = dataselection) 	& (x=FALSE) : mafft;
+                    (state = mafft) 			& (x=FALSE)	: readseq;
+                    (state = readseq)			& (x=FALSE)	: modelgenerator;
+                    TRUE: state;
+            	esac;
+    next(x)		:= case
+    				(state = dataselection) & (x=FALSE): x= TRUE;
+    				(state = mafft) & (x=FALSE): x= TRUE;
+    				TRUE: x;
+    			esac;
