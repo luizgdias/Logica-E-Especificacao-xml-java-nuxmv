@@ -2,18 +2,23 @@ MODULE main
 
 VAR
   state: {dataselection, mafft, readseq, modelgenerator};
-  x: boolean;
+  ciclo: boolean;
 ASSIGN 
 	init(state) := dataselection;
-	init(x)		:= FALSE;
+	init(ciclo)	:= FALSE;
 	next(state) := case
-                    (state = dataselection) 	& (x=FALSE) : mafft;
-                    (state = mafft) 			& (x=FALSE)	: readseq;
-                    (state = readseq)			& (x=FALSE)	: modelgenerator;
+                    (state = dataselection) : mafft;
+
+                    	(state = dataselection)? ciclo=TRUE:
+                    
+                    		(state = mafft) 	: readseq;
+
+                    			(state = mafft) | (state = dataselection)? ciclo = TRUE: 
+                    
+                    				(state = readseq)		: mafft;
+
+                    					(state = dataselection) | (state = mafft)? ciclo = TRUE: 
+
+
                     TRUE: state;
-            	esac;
-    next(x)		:= case
-    				(state = dataselection) & (x=FALSE): x= TRUE;
-    				(state = mafft) & (x=FALSE): x= TRUE;
-    				TRUE: x;
-    			esac;
+                   esac;
